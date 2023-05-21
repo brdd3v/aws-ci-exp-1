@@ -1,0 +1,24 @@
+{
+    "Config": {
+        "AttributeDefinitions": [
+            {
+                "AttributeName": "MessageId",
+                "AttributeType": "S"
+            }
+        ],
+        "TableName": "DynamoDB-Table",
+        "KeySchema": [
+            {
+                "AttributeName": "MessageId",
+                "KeyType": "HASH"
+            }
+        ],
+        "TableStatus": "ACTIVE",
+        "ProvisionedThroughput": {
+            "ReadCapacityUnits": 2,
+            "WriteCapacityUnits": 2
+        },
+        "ItemCount": 3
+    }
+}
+

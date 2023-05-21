@@ -1,0 +1,6 @@
+localstack==2.0.2
+terraform-local==0.8
+boto3==1.26.91
+pytest==7.2.2
+deepdiff==6.3.0
+pylint==2.17.4
