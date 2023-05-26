@@ -6,6 +6,9 @@ install:
 init:
 	terraform init
 
+validate:
+	terraform validate
+
 run-localstack:
 	docker pull localstack/localstack
 	localstack start -d

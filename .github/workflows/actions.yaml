@@ -31,6 +31,9 @@ jobs:
       - name: Terraform Init
         run: make init
 
+      - name: Terraform Validate
+        run: make validate
+
       - name: Terraform (Localstack) Apply
         run: make deploy-local
 
