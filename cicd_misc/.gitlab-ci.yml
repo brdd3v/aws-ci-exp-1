@@ -1,0 +1,43 @@
+image: docker:23.0.5
+
+stages:
+    - terraform-local
+
+terraform-local:
+    stage: terraform-local
+
+    rules:
+        - changes:
+            - README.md
+            - cicd_misc/*
+          when: never
+        - when: always
+
+    variables:
+        AWS_ACCESS_KEY: ${AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+        AWS_DEFAULT_REGION: eu-central-1
+        DOCKER_HOST: tcp://docker:2375
+        DOCKER_TLS_CERTDIR: ""
+        LOCALSTACK_HOSTNAME: localhost
+
+    services:
+        - name: docker:23.0.5-dind
+          alias: docker
+          command: ["--tls=false"]
+
+    before_script:
+        - apk update
+        - apk add gcc musl-dev linux-headers py3-pip python3 python3-dev make terraform
+        - make install
+
+    script:
+        - dind_ip="$(getent hosts docker | cut -d' ' -f1)"
+        - echo "${dind_ip} localhost " >> /etc/hosts
+        - DOCKER_HOST="tcp://${dind_ip}:2375"
+        - make run-localstack
+        - make init
+        - make validate
+        - make deploy-local
+        - make lint
+        - make test
