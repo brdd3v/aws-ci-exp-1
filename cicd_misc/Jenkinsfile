@@ -8,7 +8,12 @@ pipeline {
     stages {
         stage('terraform-local') {
             when {
-                not { changeset pattern: "cicd_misc/*" }
+                not {
+                    anyOf {
+                        changeset pattern: "README.md"
+                        changeset pattern: "cicd_misc/*"
+                    }
+                }
             }
             steps {
                 sh 'make install'
