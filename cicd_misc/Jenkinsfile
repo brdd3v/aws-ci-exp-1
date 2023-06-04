@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_DEFAULT_REGION = 'eu-central-1'
+    }
+    stages {
+        stage('terraform-local') {
+            when {
+                not { changeset pattern: "cicd_misc/*" }
+            }
+            steps {
+                sh 'make install'
+                sh 'make run-localstack'
+                sh 'make init'
+                sh 'make validate'
+                sh 'make deploy-local'
+                sh 'make lint'
+                sh 'make test'
+            }
+        }
+    }
+    post { 
+        always {
+            // Workspace Cleanup
+            cleanWs()
+            // Stop Docker containers
+            // Source: https://stackoverflow.com/questions/34745262/best-way-to-stop-docker-container-in-jenkins
+            script{
+                def docker_containers = sh(returnStdout: true, script: 'docker container ps -aq').replaceAll("\n", " ") 
+                if (docker_containers) {
+                    sh "docker stop ${docker_containers}"
+                }
+            }
+        }
+    }
+}
