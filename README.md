@@ -1,1 +1,1 @@
-# aws-terraform-cicd-exp
+# aws-terraform-ci-exp
