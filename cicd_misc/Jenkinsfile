@@ -12,6 +12,7 @@ pipeline {
                     anyOf {
                         changeset pattern: "README.md"
                         changeset pattern: "cicd_misc/*"
+                        changeset pattern: "diagrams/*"
                     }
                 }
                 beforeAgent true

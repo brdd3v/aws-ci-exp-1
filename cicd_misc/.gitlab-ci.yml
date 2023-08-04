@@ -10,6 +10,7 @@ terraform-local:
         - changes:
             - README.md
             - cicd_misc/*
+            - diagrams/*
           when: never
         - when: always
 
