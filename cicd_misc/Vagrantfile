@@ -1,0 +1,52 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<-SCRIPT
+sudo apt-get update && sudo apt-get install -y gnupg \
+  software-properties-common \
+  apt-transport-https \
+  python3 \
+  python3-dev \
+  python3-pip
+
+
+# Prep for Localstack
+pip3 install Click --upgrade
+echo 'export PATH="$PATH:~/.local/bin"' >> .bashrc
+
+
+# Install Terraform
+wget -O- https://apt.releases.hashicorp.com/gpg | \
+  gpg --dearmor | \
+  sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg  
+
+gpg --no-default-keyring \
+  --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg \
+  --fingerprint
+
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+  https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+  sudo tee /etc/apt/sources.list.d/hashicorp.list
+  
+sudo apt update && sudo apt-get install terraform
+
+
+# Install Java (for Jenkins)
+sudo add-apt-repository ppa:openjdk-r/ppa -y
+sudo apt install openjdk-8-jdk -y
+SCRIPT
+
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/focal64"  # Ubuntu 20.04, tested on v20230731.0.0
+  config.vm.box_check_update = "false"
+  
+  config.vm.provision "docker"
+  config.vm.provision "shell", inline: $script
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "jenkins-ubuntu-vm"
+    vb.memory = 2048
+  end
+
+end
